@@ -1,0 +1,42 @@
+body{
+	font-size: 12px;
+}
+fieldset{
+	border: 1px solid #ccc;
+}
+legend{
+	font-weight: bold;
+}
+p{
+	clear: both;
+	overflow: hidden;
+}
+p label{
+	display:block;
+	float: left;
+	width: 30%;
+}
+p input[type=text], p textarea, p select{
+	width: 70%;
+	border: 1px solid #ddd;
+	float: left;
+}
+p input[type=submit]{
+	margin-left: 30%;
+}
+.c2{
+	width: 50%;
+	float: left;
+}
+fieldset fieldset{
+	border-width: 1px 0 0 0;
+}
+.person{
+	font-weight: bold;
+	margin-top: 5px;	
+}
+.person img{
+	margin-right: 5px;
+	vertical-align: top;
+	width: 64px;
+}
