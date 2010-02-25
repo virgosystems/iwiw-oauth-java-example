@@ -8,19 +8,33 @@
 	<body>
 		<form action="IWiW" method="get">
 			<fieldset>
-				<legend>Access token</legend>
-				<c:choose>
-					<c:when test="${not empty token}">
-						${token} <a href="Reset?nextPage=iwiw.jsp">törlés</a>
-					</c:when>
-					<c:otherwise>
-						még nincs access tokened <input type="submit" value="Szerzek egyet!"/>
-					</c:otherwise>						
-				</c:choose>				
+				<legend>Autentikáció</legend>
+				<p>
+					<label>Melyik API-t használod?</label>
+					<span class="input">
+						<input type="radio" name="api" value="connect"${'social' ne param.api ? ' checked="checked"' : ''}>iWiW Connect API használata (3 lábas OAuth, Site-al)<br/>
+						<input type="radio" name="api" value="social"${'social' eq param.api ? ' checked="checked"' : ''}>iWiW Social API használata (2 lábas OAuth, Gadgettel)
+					</span>
+				</p>				
+				<p>
+					<label>Access token:</label>
+					<span class="input">
+						<c:choose>
+							<c:when test="${not empty token}">
+								${token} <a href="Reset?nextPage=iwiw.jsp">törlés</a>
+							</c:when>
+							<c:otherwise>
+								még nincs access tokened <a href="IWiW?api=connect">Szerzek egyet!</a>
+							</c:otherwise>
+						</c:choose>
+					</span>
+				</p>
+				<p>
+					<label>Person ID (xoauth_requestor_id):</label>
+					<input type="text" value="${param.xoauth_requestor_id}" name="xoauth_requestor_id"/>
+				</p>
 			</fieldset>
-		</form>
 		
-		<form action="IWiW" method="get">
 			<c:if test="${not empty responseBody or not empty person or not empty people}">
 				<fieldset>
 					<legend>Válasz</legend>

@@ -39,6 +39,8 @@ import net.oauth.server.HttpRequestMessage;
 
 import org.opensocial.Client;
 import org.opensocial.Response;
+import org.opensocial.auth.AuthScheme;
+import org.opensocial.auth.OAuth2LeggedScheme;
 import org.opensocial.auth.OAuth3LeggedScheme;
 import org.opensocial.auth.OAuth3LeggedScheme.Token;
 import org.opensocial.models.Activity;
@@ -60,33 +62,52 @@ public class IWiWConsumer extends HttpServlet {
             throws IOException, ServletException {
         OAuthConsumer consumer = null;
         String url = request.getParameter("url") != null ? request.getParameter("url") : "people/me/@self";
-        String httpMethod = request.getParameter("httpMethod") != null ? request.getParameter("httpMethod") : "GET"; 
+        String httpMethod = request.getParameter("httpMethod") != null ? request.getParameter("httpMethod") : "GET";
+        String api = request.getParameter("api");
         try {
             consumer = CookieConsumer.getConsumer("iwiw", getServletContext());
-            OAuthAccessor accessor = CookieConsumer.getAccessor(request, response, consumer);
+            OAuthAccessor accessor;
+            Client os;
+            String restBase;
+            if("social".equals(api)) {
+            	//Social API - 2 labas oauth
+            	accessor = new OAuthAccessor(consumer);
+            	restBase = consumer.getProperty("serviceProvider.baseURL") + "social/rest/";
+            	os = getOSClient(accessor, request.getParameter("xoauth_requestor_id"), restBase);
+            } else {
+            	//Connect API - 3 labas oauth
+            	accessor = CookieConsumer.getAccessor(request, response, consumer);            	
+            	restBase = consumer.getProperty("serviceProvider.baseURL") + "social/connect/rest/";
+            	os = getOSClient(accessor, null, restBase);
+            }
+            
             request.setAttribute("token", accessor.accessToken);
-            Collection<OAuth.Parameter> parameters = HttpRequestMessage.getParameters(request);
-            Client os = getOSClient(accessor);
+            
+            
             List<Person> people = null;
             Person person = null;
             String responseBody = null;
             
             //altalanos JSON REST
             if(request.getParameter("rest") != null) {
+            	Collection<OAuth.Parameter> parameters = HttpRequestMessage.getParameters(request);
+            	if("social".equals(api)) {
+            		parameters.add(new OAuth.Parameter("xoauth_requestor_id",request.getParameter("xoauth_requestor_id")));
+            	}
             	OAuthMessage message;
             	if("post".equalsIgnoreCase(httpMethod) || "put".equalsIgnoreCase(httpMethod)) {
-            		message = CookieConsumer.getAccessor(request, response, consumer).newRequestMessage(
+            		message = accessor.newRequestMessage(
             				httpMethod, 
-            				consumer.getProperty("serviceProvider.baseURL") + url, 
+            				restBase + url, 
             				parameters, 
             				new ByteArrayInputStream(request.getParameter("requestBody").getBytes()));
            			message.getHeaders().add(new OAuth.Parameter(HttpMessage.CONTENT_TYPE, "application/json"));           			
             	} else {
-            		message = CookieConsumer.getAccessor(request, response, consumer).newRequestMessage(httpMethod, consumer.getProperty("serviceProvider.baseURL") + url, parameters);
+            		message = accessor.newRequestMessage(httpMethod, restBase + url, parameters);
             	}
 	            OAuthMessage iWiWResponse = CookieConsumer.CLIENT.invoke(message, ParameterStyle.AUTHORIZATION_HEADER);
 	            responseBody = iWiWResponse.readBodyAsString();
-	            
+	         
 	        //fetchPerson	            
             } else if(request.getParameter("fetchPerson") != null){
             	person = os.send(PeopleService.getViewer()).getEntry();
@@ -123,21 +144,30 @@ public class IWiWConsumer extends HttpServlet {
         }
     }
 
-    private Client getOSClient(OAuthAccessor accessor) {
-    	
+    private Client getOSClient(OAuthAccessor accessor, String requestorId, String restBase) {    	
     	Provider provider = new Provider();
-    	provider.setRestEndpoint(((URL) accessor.consumer.getProperty("serviceProvider.baseURL")).toString());
+    	provider.setRestEndpoint(restBase);
     	provider.setVersion("0.9");
     	/*
 		accessor.consumer.serviceProvider.requestTokenURL
 		accessor.consumer.serviceProvider.userAuthorizationURL
 		accessor.consumer.serviceProvider.accessTokenURL
 		*/ 
-    	OAuth3LeggedScheme auth = new OAuth3LeggedScheme(
-    			provider, 
-    			accessor.consumer.consumerKey, 
-    			accessor.consumer.consumerSecret);
-    	auth.setAccessToken(new Token(accessor.accessToken, accessor.tokenSecret));
+    	AuthScheme auth;
+    	if(requestorId == null) {
+        	OAuth3LeggedScheme oauthScheme = new OAuth3LeggedScheme(
+        			provider, 
+        			accessor.consumer.consumerKey, 
+        			accessor.consumer.consumerSecret);
+        	oauthScheme.setAccessToken(new Token(accessor.accessToken, accessor.tokenSecret));
+        	auth = oauthScheme;
+    	} else {
+        	OAuth2LeggedScheme oauthScheme = new OAuth2LeggedScheme(
+        			accessor.consumer.consumerKey, 
+        			accessor.consumer.consumerSecret, requestorId);
+        	auth = oauthScheme;
+    	}
+
     	Client client = new Client(provider, auth);
     	return client;
     }

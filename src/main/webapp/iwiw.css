@@ -21,6 +21,11 @@ p input[type=text], p textarea, p select{
 	border: 1px solid #ddd;
 	float: left;
 }
+span.input{
+	display: block;
+	width: 70%;
+	float: left;	
+}
 p input[type=submit]{
 	margin-left: 30%;
 }

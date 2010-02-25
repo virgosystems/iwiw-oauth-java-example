@@ -3,6 +3,9 @@ git clone http://github.com/virgo/iwiw-oauth-java-example.git
 vagy:
 http://github.com/downloads/virgo/iwiw-oauth-java-example/iwiw-oauth-java-example.zip
 
+# Kell hozzá
+Maven http://maven.apache.org/download.html#Installation
+
 # Konfigurálás
 Ebből a fájlból készíts másolatot:
 src/main/java/net/oauth/example/consumer/webapp/consumer.properties.sample
