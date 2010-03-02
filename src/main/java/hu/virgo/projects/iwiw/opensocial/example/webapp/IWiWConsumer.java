@@ -46,6 +46,7 @@ import org.opensocial.auth.OAuth3LeggedScheme.Token;
 import org.opensocial.models.Activity;
 import org.opensocial.models.MediaItem;
 import org.opensocial.models.Person;
+import org.opensocial.models.Model;
 import org.opensocial.providers.Provider;
 import org.opensocial.services.ActivitiesService;
 import org.opensocial.services.PeopleService;
@@ -120,7 +121,7 @@ public class IWiWConsumer extends HttpServlet {
             	activity.setTitle(request.getParameter("title"));
             	activity.setBody(request.getParameter("body"));
             	Response osResponse = os.send(ActivitiesService.createActivity(activity));
-            	responseBody = osResponse.getEntry() != null ? osResponse.getEntry().toJSONString() : null;
+            	responseBody = osResponse.<Model>getEntry() != null ? osResponse.<Model>getEntry().toJSONString() : null;
         	//createActivity2            	
             } else if(request.getParameter("createActivity2") != null) {
             	Activity activity = new Activity();
@@ -133,7 +134,7 @@ public class IWiWConsumer extends HttpServlet {
             	mediaItem.setField("thumbnailUrl",request.getParameter("mediaitem_thumbnailUrl"));
             	activity.setField("mediaItems", Collections.singletonList(mediaItem));
             	Response osResponse = os.send(ActivitiesService.createActivity(activity)); 
-            	responseBody = osResponse.getEntry() != null ? osResponse.getEntry().toJSONString() : null;
+            	responseBody = osResponse.<Model>getEntry() != null ? osResponse.<Model>getEntry().toJSONString() : null;
             }
             request.setAttribute("people", people);
             request.setAttribute("person", person);
