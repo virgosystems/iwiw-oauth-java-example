@@ -1,19 +1,21 @@
 # Sample configuration that works with several demo service providers.
 # You'll need to provide consumer keys and secrets for some of these.
 
-iwiw.serviceProvider.baseURL: /social/connect/rest/
-iwiw.serviceProvider.requestTokenURL: /social/oauth/requestToken
-iwiw.serviceProvider.userAuthorizationURL: http://iwiw.hu/pages/auth/authorize.jsp
-iwiw.serviceProvider.accessTokenURL: /social/oauth/accessToken
+# iWiW sandbox
+iwiw.serviceProvider.baseURL: http://api.sandbox.iwiw.hu/
+iwiw.serviceProvider.requestTokenURL: http://api.sandbox.iwiw.hu/social/oauth/requestToken
+iwiw.serviceProvider.userAuthorizationURL: http://sandbox.iwiw.hu/pages/auth/authorize.jsp
+iwiw.serviceProvider.accessTokenURL: http://api.sandbox.iwiw.hu/social/oauth/accessToken
 iwiw.consumerKey: kulcs
 iwiw.consumerSecret: titkos_kulcs
 
-iwiw_sandbox.serviceProvider.baseURL: /social/rest/
-iwiw_sandbox.serviceProvider.requestTokenURL: /social/oauth/requestToken
-iwiw_sandbox.serviceProvider.userAuthorizationURL: http://sandbox.iwiw.hu/pages/auth/authorize.jsp
-iwiw_sandbox.serviceProvider.accessTokenURL: /social/oauth/accessToken
-iwiw_sandbox.consumerKey: kulcs
-iwiw_sandbox.consumerSecret: titkos_kulcs
+# iWiW live
+#iwiw.serviceProvider.baseURL: http://api.iwiw.hu/
+#iwiw.serviceProvider.requestTokenURL: http://api.iwiw.hu/social/oauth/requestToken
+#iwiw.serviceProvider.userAuthorizationURL: http://iwiw.hu/pages/auth/authorize.jsp
+#iwiw.serviceProvider.accessTokenURL: http://api.iwiw.hu/social/oauth/accessToken
+#iwiw.consumerKey: kulcs
+#iwiw.consumerSecret: titkos_kulcs
 
 ma.gnolia.serviceProvider.baseURL: http://ma.gnolia.com/
 ma.gnolia.serviceProvider.requestTokenURL: oauth/get_request_token
