@@ -68,7 +68,7 @@
 					<p>
 						<label>	HTTP request method:</label>						
 						<select name="httpMethod">
-							<c:forTokens items="GET POST PUT" delims=" " var="item">
+							<c:forTokens items="GET POST PUT DELETE" delims=" " var="item">
 								<option${item eq param.httpMethod ? ' selected="selected"' : ''}>${item}</option>
 							</c:forTokens>
 						</select>
