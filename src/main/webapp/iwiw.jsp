@@ -35,9 +35,12 @@
 				</p>
 			</fieldset>
 		
-			<c:if test="${not empty responseBody or not empty person or not empty people}">
+			<c:if test="${not empty responseBody or not empty person or not empty people or not empty statusCode}">
 				<fieldset>
 					<legend>Válasz</legend>
+					<c:if test="${statusCode ne null}">
+						<pre>HTTP Status: ${statusCode}</pre>						
+					</c:if>
 					<c:if test="${responseBody ne null}">
 						JSON:
 						<pre class="prettyprint lang-json" id="json">

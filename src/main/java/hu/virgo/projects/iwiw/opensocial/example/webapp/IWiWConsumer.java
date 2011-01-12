@@ -18,7 +18,6 @@ package hu.virgo.projects.iwiw.opensocial.example.webapp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +32,7 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.ParameterStyle;
+import net.oauth.client.OAuthResponseMessage;
 import net.oauth.example.consumer.webapp.CookieConsumer;
 import net.oauth.http.HttpMessage;
 import net.oauth.server.HttpRequestMessage;
@@ -45,8 +45,8 @@ import org.opensocial.auth.OAuth3LeggedScheme;
 import org.opensocial.auth.OAuth3LeggedScheme.Token;
 import org.opensocial.models.Activity;
 import org.opensocial.models.MediaItem;
-import org.opensocial.models.Person;
 import org.opensocial.models.Model;
+import org.opensocial.models.Person;
 import org.opensocial.providers.Provider;
 import org.opensocial.services.ActivitiesService;
 import org.opensocial.services.PeopleService;
@@ -102,12 +102,19 @@ public class IWiWConsumer extends HttpServlet {
             				restBase + url, 
             				parameters, 
             				new ByteArrayInputStream(request.getParameter("requestBody").getBytes()));
-           			message.getHeaders().add(new OAuth.Parameter(HttpMessage.CONTENT_TYPE, "application/json"));           			
+           			message.getHeaders().add(new OAuth.Parameter(HttpMessage.CONTENT_TYPE, "application/json"));
             	} else {
             		message = accessor.newRequestMessage(httpMethod, restBase + url, parameters);
             	}
-	            OAuthMessage iWiWResponse = CookieConsumer.CLIENT.invoke(message, ParameterStyle.AUTHORIZATION_HEADER);
-	            responseBody = iWiWResponse.readBodyAsString();
+	            
+	            // response HTTP status code feldolgozasa
+	            OAuthResponseMessage iWiWOAuthResponseMessage = CookieConsumer.CLIENT.access(message, ParameterStyle.AUTHORIZATION_HEADER);
+	            
+	            int httpStatusCode =  iWiWOAuthResponseMessage.getHttpResponse().getStatusCode();
+	            request.setAttribute("statusCode", httpStatusCode);
+	            if( httpStatusCode / 200 == 1 ) {
+	            	responseBody = iWiWOAuthResponseMessage.readBodyAsString();
+	            }
 	         
 	        //fetchPerson	            
             } else if(request.getParameter("fetchPerson") != null){
@@ -136,6 +143,7 @@ public class IWiWConsumer extends HttpServlet {
             	Response osResponse = os.send(ActivitiesService.createActivity(activity)); 
             	responseBody = osResponse.<Model>getEntry() != null ? osResponse.<Model>getEntry().toJSONString() : null;
             }
+            
             request.setAttribute("people", people);
             request.setAttribute("person", person);
             request.setAttribute("responseBody", responseBody);
